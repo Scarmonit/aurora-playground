@@ -1,84 +1,110 @@
 # aurora-playground
 Sandbox repo for experiments and demos
 
-## GitHub MCP Server Setup
+## MCP Server Suite
 
-This repository is configured with a GitHub MCP (Model Context Protocol) server that enables Claude Code to interact with GitHub directly.
+This repository is configured with a comprehensive suite of MCP (Model Context Protocol) servers that enable Claude Code to interact with various systems.
 
-### Features
+### Configured Servers
 
-The GitHub MCP server provides the following capabilities:
-
-- **Repository Management**: Create, fork, and manage repositories
-- **Issues**: Create, read, update, and comment on issues
-- **Pull Requests**: Create, review, merge, and manage pull requests
-- **Branches**: Create and manage branches
-- **Files**: Read, create, update, and delete files in repositories
-- **Search**: Search for code, issues, repositories, and users
-- **Commits**: View commit history and details
-- **Releases**: Create and manage releases
-- **Actions**: View workflow runs and statuses
+| Server | Description | Key Capabilities |
+|--------|-------------|------------------|
+| **GitHub** | GitHub API integration | Repos, issues, PRs, branches, search |
+| **Git** | Local git operations | Commits, diffs, logs, blame, branches |
+| **Filesystem** | File system access | Read, write, search, directory ops |
+| **Fetch** | Web content retrieval | HTTP requests, HTML-to-markdown |
+| **Memory** | Persistent memory | Knowledge graph, entity storage |
 
 ### Quick Setup
 
-1. **Create a GitHub Personal Access Token**:
-   - Go to [GitHub Settings > Tokens](https://github.com/settings/tokens)
-   - Click "Generate new token (classic)"
-   - Select these scopes:
-     - `repo` - Full control of private repositories
-     - `read:org` - Read org and team membership
-     - `gist` - Create gists
-     - `read:user` - Read user profile data
-     - `read:project` - Read project boards
-   - Click "Generate token" and copy it
-
-2. **Configure the token**:
+1. **Authenticate with GitHub** (one-time):
    ```bash
-   # Copy the example env file
-   cp .env.example .env
-
-   # Edit .env and add your token
-   # GITHUB_PERSONAL_ACCESS_TOKEN=ghp_your_token_here
+   gh auth login
    ```
 
-3. **Start Claude Code** with the environment variable:
-   ```bash
-   # Option 1: Load from .env file
-   source .env && claude
+2. **Start Claude Code** in this directory - MCP servers auto-configure.
 
-   # Option 2: Set directly
-   GITHUB_PERSONAL_ACCESS_TOKEN=ghp_your_token claude
-   ```
+### GitHub Server Capabilities
 
-### MCP Configuration
+- **Repository Management**: Create, fork, clone, delete repos
+- **Issues**: Create, update, close, comment, label
+- **Pull Requests**: Create, review, merge, request changes
+- **Branches**: Create, delete, protect, compare
+- **Files**: Read, create, update, delete via API
+- **Search**: Code, issues, repos, users, commits
+- **Releases**: Create, edit, publish releases
+- **Actions**: View workflow runs and statuses
 
-The MCP server is configured in `.mcp.json`:
+### Git Server Capabilities
+
+- **History**: View commits, logs, blame
+- **Diffs**: Compare branches, commits, files
+- **Branches**: List, create, checkout
+- **Status**: Working tree status, staged changes
+
+### Filesystem Server Capabilities
+
+- **Read**: File contents, directory listings
+- **Write**: Create and modify files
+- **Search**: Find files by pattern
+- **Info**: File metadata, permissions
+
+### Fetch Server Capabilities
+
+- **HTTP**: GET/POST requests to URLs
+- **Parse**: Convert HTML to markdown
+- **Extract**: Pull content from web pages
+
+### Memory Server Capabilities
+
+- **Entities**: Store and retrieve named entities
+- **Relations**: Create connections between entities
+- **Search**: Query the knowledge graph
+- **Persist**: Long-term memory across sessions
+
+## Configuration
+
+MCP servers are configured in `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
-      }
-    }
+    "github": { "command": "sh", "args": ["-c", "GITHUB_PERSONAL_ACCESS_TOKEN=$(gh auth token) npx -y @modelcontextprotocol/server-github"] },
+    "git": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-git"] },
+    "filesystem": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/user/aurora-playground"] },
+    "fetch": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-fetch"] },
+    "memory": { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-memory"] }
   }
 }
 ```
 
-### Usage Examples
+## Usage Examples
 
-Once configured, you can ask Claude Code to:
+Once configured, ask Claude Code to:
 
-- "Create a new issue in this repository"
+### GitHub Operations
+- "Create an issue titled 'Bug: login fails'"
 - "List all open pull requests"
+- "Create a new branch called 'feature/auth'"
 - "Search for files containing 'authentication'"
-- "Create a new branch called 'feature/new-feature'"
-- "Review the latest pull request"
-- "Fork this repository"
-- "Create a release v1.0.0"
+
+### Git Operations
+- "Show the last 10 commits"
+- "What changed in the last commit?"
+- "Show git blame for README.md"
+
+### File Operations
+- "List all TypeScript files"
+- "Read the package.json file"
+- "Search for TODO comments"
+
+### Web Operations
+- "Fetch the content from https://example.com"
+- "Get the latest docs from the API"
+
+### Memory Operations
+- "Remember that the API key is stored in .env"
+- "What do you know about this project?"
 
 ## License
 
